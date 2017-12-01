@@ -11,9 +11,9 @@ export default class Login extends Component {
     render(){
         return (
             <div>
-                login page
-                
-
+                <a href={ process.env.REACT_APP_LOGIN }>sign in</a>
+                <br/>
+                <a href={ process.env.REACT_APP_LOGIN }>register</a>
             </div>
         )
     }
