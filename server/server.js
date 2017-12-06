@@ -38,21 +38,23 @@ passport.use(new Auth0Strategy({
     // db calls
 
     // console.log(profile._json.identities[0])
+    console.log('profile is...', typeof profile.identities[0].user_id)
 
     const db = app.get('db');
 
     db.find_user([ profile.identities[0].user_id ]).then( user => {
         if(user[0]){
-            console.log('USER EXSISTS', user[0])
+            console.log('USER EXSISTS with id of...', user[0])
             
-            return done(null, user[0].id)
+            return done(null, user[0].user_id)
         } else {
             console.log('CREATING A NEW USER')
             const user = profile._json
+            console.log('user is..', user.identities[0].user_id)
             db.create_user([ user.name, user.email, user.picture, user.identities[0].user_id ])
             .then( user => {
-            
-                return done(null,user[0].id)
+                
+                return done(null,user[0].user_id)
             })
         }
     })
@@ -61,10 +63,10 @@ passport.use(new Auth0Strategy({
 
 app.get('/auth', passport.authenticate('auth0'))
 app.get('/auth/callback', passport.authenticate('auth0',{
-    // successRedirect: '/#/dashboard',
-    // failureRedirect: '/#/welcome'
-    successRedirect: 'http://localhost:3000/#/dashboard',
-    failureRedirect: 'http://localhost:3000/#/'
+
+    successRedirect: 'http://localhost:3000/browse',
+    failureRedirect: 'http://localhost:3000/'
+
 }))
 app.get('/auth/me', (req,res) => {
     console.log(req.user)
@@ -76,12 +78,12 @@ app.get('/auth/me', (req,res) => {
 
 app.get('/auth/logout', (req, res) => {
     req.logOut();
-    // res.redirect(302, '/#/')
-    res.redirect('http://localhost:3000/#/')
+    res.redirect('http://localhost:3000/')
 })
 
 passport.serializeUser( function( user, done ){
-    console.log('SERIRIALIZED')
+    console.log('SERIALIZED')
+    console.log('user is...', user)
     done(null, user);
 })
 passport.deserializeUser( function( user, done ){
